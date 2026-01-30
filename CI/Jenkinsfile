@@ -15,6 +15,7 @@ pipeline {
     }
 
     options {
+        skipDefaultCheckout()
         // Timeout after 12 hours to prevent stuck builds
         timeout(time: 12, unit: 'HOURS')
         // Keep timestamps in logs
@@ -22,17 +23,48 @@ pipeline {
     }
 
     stages {
+        stage('Init') {
+            steps {
+                script {
+                    // Check if .repo exists, if not initialize it
+                    if (!fileExists('.repo')) {
+                        echo 'Initializing repo...'
+                        sh 'repo init -u https://github.com/crdroidandroid/android.git -b 16.0 --git-lfs --no-clone-bundle'
+                    } else {
+                        echo '.repo already exists, skipping init'
+                    }
+                }
+            }
+        }
+
+        stage('Fetch Manifests') {
+            steps {
+                script {
+                    // Create local_manifests directory if it doesn't exist
+                    sh 'mkdir -p .repo/local_manifests'
+                    // Copy roomservice.xml from development repo
+                    sh 'cp development/local_manifests/roomservice.xml .repo/local_manifests/'
+                    echo 'Copied roomservice.xml to .repo/local_manifests/'
+                }
+            }
+        }
+
         stage('Sync') {
             steps {
                 script {
                     // Sync the repo
-                    // Assumes the workspace is already initialized with `repo init`
                     sh 'repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags'
                 }
             }
         }
 
         stage('Build') {
+            when {
+                expression {
+                    // Only build if device tree exists
+                    return fileExists('device/samsung/r8q')
+                }
+            }
             steps {
                 script {
                     sh '''
@@ -47,6 +79,18 @@ pipeline {
                         brunch r8q
                     '''
                 }
+            }
+        }
+
+        stage('Device Tree Missing') {
+            when {
+                expression {
+                    return !fileExists('device/samsung/r8q')
+                }
+            }
+            steps {
+                echo 'ERROR: device/samsung/r8q not found. Skipping build.'
+                echo 'Please ensure roomservice.xml is configured correctly in .repo/local_manifests/'
             }
         }
     }
