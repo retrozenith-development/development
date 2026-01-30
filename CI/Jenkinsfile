@@ -41,7 +41,7 @@ pipeline {
             steps {
                 script {
                     mkdir -p .repo/local_manifests
-                    wget -O .repo/local_manifests/roomservice.xml https://raw.githubusercontent.com/retrozenith-development/development/refs/heads/main/local_manifests/roomservice.xml
+                    wget -O .repo/local_manifests/roomservice.xml "https://raw.githubusercontent.com/retrozenith-development/development/refs/heads/main/local_manifests/roomservice.xml"
                     echo "Downloaded roomservice.xml"
                 }
             }
