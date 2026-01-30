@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-    <remote name="github" fetch="https://github.com" />
-
     <!-- Device Tree -->
     <project name="LineageOS/android_device_samsung_r8q" path="device/samsung/r8q" remote="github" revision="lineage-23.0" />
 
