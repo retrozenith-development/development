@@ -40,11 +40,9 @@ pipeline {
         stage('Fetch Manifests') {
             steps {
                 script {
-                    // Create local_manifests directory if it doesn't exist
-                    sh 'mkdir -p .repo/local_manifests'
-                    // Copy roomservice.xml from development repo
-                    sh 'cp development/local_manifests/roomservice.xml .repo/local_manifests/'
-                    echo 'Copied roomservice.xml to .repo/local_manifests/'
+                    mkdir -p .repo/local_manifests
+                    wget -O .repo/local_manifests/roomservice.xml https://raw.githubusercontent.com/retrozenith-development/development/refs/heads/main/local_manifests/roomservice.xml
+                    echo "Downloaded roomservice.xml"
                 }
             }
         }
