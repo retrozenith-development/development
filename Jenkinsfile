@@ -1,5 +1,10 @@
 pipeline {
-    agent { label 'AOSP' }
+    agent {
+        node {
+            label 'AOSP'
+            customWorkspace '/aosp/crDroid'
+        }
+    }
 
     environment {
         // Set up ccache to speed up builds
